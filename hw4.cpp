@@ -77,25 +77,43 @@ void release()
 int main()
 {
     readParameters();
-   	bool **visit;
-   	visit = new bool*[n+1];
-   	parent[]
+   	bool **visited;
+    int **parent;
+    parent = new int*[n+1];
+   	visited = new bool*[n+1];
    	for(int i = 0;i<n+1;i++){
    		visit[i] = new bool[m+1]();
+        parent[i] = new int[m+1]();
    	}
     node* first = NULL;
     priority_queue<node>pq;
-    cur = new node(0,0);
-    cur->d = 0;
-    pq.push(cur);
+    first = new node(0,0);
+    first->d = 0;
+    visited[0][0] = true;
+    pq.push(first);
     while(!pq.empty()){
     	node* cur = pq.top();
-    	pq.pop();
+        pq.pop();
+        //the last node
+        if(pq.empty()){
+            first = cur;
+            break;
+        }   
     	int curx = cur.x;
     	int cury = cur.y;
     	for(int i = 0;i<4;i++){
     		if(curx +dx[i] > 0&& curx+dx[i]< m&&cury+dy[i] > 0 && cury+dy[i]< n){
-    			
+    			if(!visited[curx+dx[i]][cury+dy[i]]){
+                    node* next;
+                    next = new node(curx+dx[i],cury+dy[i])
+                    visited[curx+dx[i]][curx+dx[i]] = true;
+                    if(dx[i] == 0){
+
+                    }
+                    if(dy[i] == 0){
+
+                    }
+                }
     		}
     	}
     }
