@@ -6,6 +6,7 @@
 #include <string>
 using namespace std;
 #define INF 712271227122;
+typedef stringstream ss;
 /************************************
 *  Note that in general using global
 *  variables is a bad habit.
@@ -40,7 +41,7 @@ bool operator<(node a,node b){
 
 void readParameters()
 {
-    ifstream ifs("input/problem1/input3", ifstream::binary);
+    ifstream ifs("input", ifstream::binary);
 
     ifs.read((char*)&m, sizeof(int));
     ifs.read((char*)&n, sizeof(int));
@@ -138,7 +139,8 @@ int main()
             }
         }
     }
-    cout << pq.top().d << endl;
+    ofstream ofs("result.txt", ofstream::binary);
+    ofs << pq.top().d << endl;
     int px = pq.top().x;
     int py = pq.top().y;
     string path = "";
@@ -158,8 +160,9 @@ int main()
         }
     }
     for(int i = path.length()-1;i>=0;i--){
-        cout << path[i];
+        ofs  << path[i];
     }
+    ofs.close();
     release();
     return 0;
 }
