@@ -1,6 +1,7 @@
 
 #include <iostream>
 #include <fstream>
+#include <math.h>
 #include <queue>
 #include <utility>
 using namespace std;
@@ -25,15 +26,15 @@ const int dy[4] = {0,1,0,-1};
 
 struct node{
 	int x,y;
-	long int d;
+	double d;
 	node(int _x,int _y){
 		x = _x;
 		y = _y;
 		d = 712271227122;
 	}
 };
-bool operator<(node* a,node* b){
-	return a->d > b->d;
+bool operator<(node a,node b){
+	return a.d > b.d;
 }
 
 void readParameters()
@@ -58,7 +59,6 @@ void readParameters()
     for (int i=0; i<n+1; ++i){
         h[i] = &(real_h[i*m]);
 	}
-
     ifs.close();
 	
 	
@@ -86,48 +86,51 @@ int main()
         parent[i] = new pii[m+1];
    	}
     node* first = NULL;
-    priority_queue<node*>pq;
+    priority_queue<node>pq;
     first = new node(0,0);
     first->d = 0;
-    visited[0][0] = true;
-    pq.push(first);
+    //visited[0][0] = true;
+    pq.push(*first);
     //cout << n << " " << m << endl;
     while(!pq.empty()){
-    	node* cur = pq.top();
+    	node temp = pq.top();
+        node* cur = &temp;
         cout << cur->x << " "<< cur->y << endl;   
     	int curx = cur->x;
     	int cury = cur->y;
         pq.pop();
+        if(visited[curx][cury] == true) continue;
+        visited[curx][cury] = true;
     	for(int i = 0;i<4;i++){
     		if(curx +dx[i] >= 0 && curx+dx[i]<= m && cury+dy[i] >= 0 && cury+dy[i]<= n){
-    			if(!visited[cury+dy[i]][curx+dx[i]]){
+    			//if(!visited[cury+dy[i]][curx+dx[i]]){
                     node* next;
                     next = new node(curx+dx[i],cury+dy[i]);
                     visited[cury+dy[i]][curx+dx[i]] = true;
                     if(dx[i] == 0){
                         if(dy[i] == -1){
-                            next->d =  cur->d+v[cury-1][curx];
+                            next->d =  min(cur->d+v[cury-1][curx],next->d);
                         }
                         else if(dy[i] == 1){
-                            next->d = cur->d+v[cury][curx];
+                            next->d = min(cur->d+v[cury][curx],next->d);
                         }
                     }
                     if(dy[i] == 0){
                         if(dx[i] == -1){
-                            next->d = cur->d+h[cury][curx-1];
+                            next->d = min(cur->d+h[cury][curx-1],next->d);
                         }
                         else if(dx[i] == 1){
-                             next->d = cur->d+h[cury][curx];
+                             next->d = min(cur->d+h[cury][curx],next->d);
                         }
                     }
                     parent[next->y][next->x] = make_pair(cury,curx);
-                    cout << "pushed" << next->x << " " << next->y << endl;
-                    if(next->y == n && next->x == m){
-                        cout << next->d << endl; 
-                        break;
+                    //cout << "pushed" << next->x << " " << next->y << endl;
+                    //cout << "distance: " << next->d << endl;
+                    if(next->x == m && next->y == n){
+                        cout << next->x << " " << next->y << endl << "distance: " << next->d << endl;
                     }
-                    pq.push(next);
-                }
+                    pq.push(*next);
+                //}
     		}
     	}
     }
