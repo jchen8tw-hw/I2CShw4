@@ -3,9 +3,9 @@
 #include <fstream>
 #include <math.h>
 #include <queue>
-#include <utility>
+#include <string>
 using namespace std;
-typedef pair<int,int> pii;
+#define INF 712271227122;
 /************************************
 *  Note that in general using global
 *  variables is a bad habit.
@@ -27,11 +27,12 @@ const int dy[4] = {0,1,0,-1};
 struct node{
 	int x,y;
 	double d;
-	node(int _x,int _y){
-		x = _x;
-		y = _y;
-		d = 712271227122;
+    bool visited;
+	node(){
+		d = INF;
+        visited = false;
 	}
+    char parent;
 };
 bool operator<(node a,node b){
 	return a.d > b.d;
@@ -39,7 +40,7 @@ bool operator<(node a,node b){
 
 void readParameters()
 {
-    ifstream ifs("input/problem1/input1", ifstream::binary);
+    ifstream ifs("input/problem1/input3", ifstream::binary);
 
     ifs.read((char*)&m, sizeof(int));
     ifs.read((char*)&n, sizeof(int));
@@ -77,62 +78,87 @@ void release()
 int main()
 {
     readParameters();
-   	bool **visited;
-    pii **parent;
-    parent = new pii*[n+1];
-   	visited = new bool*[n+1];
-   	for(int i = 0;i<n+1;i++){
-   		visited[i] = new bool[m+1]();
-        parent[i] = new pii[m+1];
-   	}
-    node* first = NULL;
     priority_queue<node>pq;
-    first = new node(0,0);
-    first->d = 0;
-    //visited[0][0] = true;
-    pq.push(*first);
-    //cout << n << " " << m << endl;
+    node **map;
+    map = new node*[n+1];
+    for(int i = 0;i<=n;i++){
+        map[i] = new node[m+1];
+        for(int j = 0;j<=m;j++){
+            map[i][j].x = j;
+            map[i][j].y = i;
+        }
+    }
+    map[0][0].d = 0;
+    pq.push(map[0][0]);
     while(!pq.empty()){
-    	node temp = pq.top();
-        node* cur = &temp;
-        cout << cur->x << " "<< cur->y << endl;   
-    	int curx = cur->x;
-    	int cury = cur->y;
-        pq.pop();
-        if(visited[curx][cury] == true) continue;
-        visited[curx][cury] = true;
-    	for(int i = 0;i<4;i++){
-    		if(curx +dx[i] >= 0 && curx+dx[i]<= m && cury+dy[i] >= 0 && cury+dy[i]<= n){
-    			//if(!visited[cury+dy[i]][curx+dx[i]]){
-                    node* next;
-                    next = new node(curx+dx[i],cury+dy[i]);
-                    //visited[cury+dy[i]][curx+dx[i]] = true;
+        int curx = -1;
+        int cury = -1;       
+        while(!pq.empty() && map[cury = pq.top().y][curx = pq.top().x].visited)
+            pq.pop();
+        if(curx == -1 || cury == -1) break;
+        if(curx == m && cury == n) break;
+        map[cury][curx].visited = true;
+        for(int i = 0;i<4;i++){
+            if(curx +dx[i] >= 0 && curx+dx[i]<= m && cury+dy[i] >= 0 && cury+dy[i]<= n){
+                if(!map[cury+dy[i]][curx+dx[i]].visited){
                     if(dx[i] == 0){
                         if(dy[i] == -1){
-                            next->d =  min(cur->d+v[cury-1][curx],next->d);
+                            if(map[cury][curx].d+v[cury-1][curx]<map[cury+dy[i]][curx+dx[i]].d){
+                                map[cury+dy[i]][curx+dx[i]].parent = 'u';
+                                map[cury+dy[i]][curx+dx[i]].d = map[cury][curx].d+v[cury-1][curx];
+                                pq.push(map[cury+dy[i]][curx+dx[i]]);
+                            }
                         }
                         else if(dy[i] == 1){
-                            next->d = min(cur->d+v[cury][curx],next->d);
+                            if(map[cury][curx].d+v[cury][curx]<map[cury+dy[i]][curx+dx[i]].d){
+                                map[cury+dy[i]][curx+dx[i]].parent = 'd';
+                                map[cury+dy[i]][curx+dx[i]].d = map[cury][curx].d+v[cury][curx];
+                                pq.push(map[cury+dy[i]][curx+dx[i]]);
+                            }
                         }
                     }
                     if(dy[i] == 0){
                         if(dx[i] == -1){
-                            next->d = min(cur->d+h[cury][curx-1],next->d);
+                            if(map[cury][curx].d+h[cury][curx-1]<map[cury+dy[i]][curx+dx[i]].d){
+                                map[cury+dy[i]][curx+dx[i]].parent = 'l';
+                                map[cury+dy[i]][curx+dx[i]].d = map[cury][curx].d+h[cury][curx-1];
+                                pq.push(map[cury+dy[i]][curx+dx[i]]);
+                            }
                         }
                         else if(dx[i] == 1){
-                             next->d = min(cur->d+h[cury][curx],next->d);
+                             if(map[cury][curx].d+h[cury][curx]<map[cury+dy[i]][curx+dx[i]].d){
+                                map[cury+dy[i]][curx+dx[i]].parent = 'r';
+                                map[cury+dy[i]][curx+dx[i]].d = map[cury][curx].d+h[cury][curx];
+                                pq.push(map[cury+dy[i]][curx+dx[i]]);
+                             }
                         }
                     }
-                    parent[next->y][next->x] = make_pair(cury,curx);
-                    //cout << "pushed" << next->x << " " << next->y << endl;
-                    //cout << "distance: " << next->d << endl;
-                    if(next->x == m && next->y == n){
-                        cout << next->x << " " << next->y << endl << "distance: " << next->d << endl;
-                    }
-                    pq.push(*next);
-                //}
-    		}
-    	}
+                    
+                }
+            }
+        }
+    }
+    cout << pq.top().d << endl;
+    int px = pq.top().x;
+    int py = pq.top().y;
+    string path = "";
+    while(px !=0  || py!=0){
+        path+=map[py][px].parent;
+        if(map[py][px].parent == 'u'){
+            py++;
+        }
+        else if(map[py][px].parent == 'd'){
+            py--;
+        }
+        else if(map[py][px].parent == 'l'){
+            px++;
+        }
+        else if(map[py][px].parent == 'r'){
+            px--;
+        }
+    }
+    for(int i = path.length()-1;i>=0;i--){
+        cout << path[i];
     }
     release();
     return 0;
