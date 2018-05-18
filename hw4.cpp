@@ -106,7 +106,7 @@ int main()
     			//if(!visited[cury+dy[i]][curx+dx[i]]){
                     node* next;
                     next = new node(curx+dx[i],cury+dy[i]);
-                    visited[cury+dy[i]][curx+dx[i]] = true;
+                    //visited[cury+dy[i]][curx+dx[i]] = true;
                     if(dx[i] == 0){
                         if(dy[i] == -1){
                             next->d =  min(cur->d+v[cury-1][curx],next->d);
